@@ -1,8 +1,27 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import CreateTask from "./pages/CreateTask";
 import EditTask from "./pages/EditTask";
+
+function WelcomePage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="text-center">
+      <h1 className="text-3xl font-bold mb-4">Welcome to Task Manager</h1>
+      <p className="mb-6 text-gray-600">
+        Organize your tasks efficiently and stay on track.
+      </p>
+      <button
+        onClick={() => navigate("/tasks")}
+        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
+      >
+        Get Started
+      </button>
+    </div>
+  );
+}
 
 function App() {
   const [tasks, setTasks] = useState(() => {
@@ -26,32 +45,17 @@ function App() {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
-   const path = window.location.pathname;
-
- return (
+  return (
     <div className="p-6 max-w-4xl mx-auto">
-      {path === "/" && (
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Welcome to Task Manager</h1>
-          <p className="mb-6 text-gray-600">
-            Organize your tasks efficiently and stay on track.
-          </p>
-          <button
-            onClick={() => window.history.pushState({}, "", "/tasks") || window.dispatchEvent(new Event("popstate"))}
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"
-          >
-            Get Started
-          </button>
-        </div>
-      )}
-
-      {path === "/tasks" && <Home tasks={tasks} deleteTask={deleteTask} />}
-
-      {path === "/create" && <CreateTask addTask={addTask} />}
-
-      {path.startsWith("/edit/") && (
-        <EditTask tasks={tasks} updateTask={updateTask} />
-      )}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/tasks" element={<Home tasks={tasks} deleteTask={deleteTask} />} />
+          <Route path="/create" element={<CreateTask addTask={addTask} />} />
+          <Route path="/edit/:id" element={<EditTask tasks={tasks} updateTask={updateTask} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
